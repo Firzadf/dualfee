@@ -1,0 +1,10 @@
+node_modules
+dist
+*.tsbuildinfo
+.env
+.env.*
+scratch
+contracts/node_modules
+contracts/cache
+contracts/hh-artifacts
+contracts/typechain-types
