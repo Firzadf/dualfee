@@ -14,9 +14,13 @@
     "measure": "tsx scripts/measure.ts"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
     "@polkadot/api": "^16.5.6",
     "@polkadot/util": "^14.0.3",
     "@polkadot/util-crypto": "^14.0.3",
+    "framer-motion": "^11.18.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.30.6"

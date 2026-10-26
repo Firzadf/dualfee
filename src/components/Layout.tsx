@@ -11,7 +11,9 @@ const links = [
 export default function Layout() {
   const [open, setOpen] = useState(false);
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen">
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-grid" />
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-noise" />
       <header className="sticky top-0 z-20 border-b border-ink-800 bg-ink-950/90 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight" onClick={() => setOpen(false)}>
