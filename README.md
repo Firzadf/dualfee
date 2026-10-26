@@ -41,21 +41,60 @@ That EVM gas folds in the deposit is our inference from the numbers (EVM total �
 
 ## Features
 
-- **Fee Lab** (`/lab`): native transfer, ERC-20 transfer, contract deploy (sample bytecode), or pasted calldata. Shows both live estimates side by side with method, gas, gas price, weight, deposit, both ratios, and the recommended path. If a surface can't estimate an op, it shows **unavailable** with the reason.
-- **Leaderboard** (`/leaderboard`): six common ops measured in your browser, cached in `localStorage` with a timestamp. **Re-measure live** refreshes them.
-- **SDK** (`packages/sdk`): `estimateBoth(tx)`, `pickCheapest(tx)`, `liveDecimals(api)`, and EVM↔native account mapping helpers. See [packages/sdk/README.md](packages/sdk/README.md).
-- **FeeRegistry** (`contracts/src/FeeRegistry.sol`): an append-only on-chain log of comparisons (hash, op type, both fees, timestamp, `ComparisonRecorded` event). The `/deploy` page deploys it and records comparisons through **your injected wallet** (MetaMask) and shows the tx hash.
-- **Landing** (`/`): the problem, the ~800× figure credited to another builder and re-measured live, and how it works. **`/judges`** is a 60-second walkthrough.
+Live at **https://dualfee.vercel.app**. Multi-page app; every number is read live from the two Portaldot V3 endpoints or from your own earlier measurements in localStorage, never mocked.
+
+| Route | What it does |
+| --- | --- |
+| `/` | Landing: animated hero where the EVM and Native paths converge into one live answer (the sample deploy is measured as soon as both surfaces answer), live ticker (block, gas price, fee multiplier, latency on both surfaces), Problem → **Myth vs reality** (stacked bar: EVM gas vs native fee vs fee + storage deposit, count-up ratios) → How it works → Features → CTA. |
+| `/app/lab` | **Fee Lab**: native transfer, ERC-20 transfer, contract deploy (SampleToken / FeeRegistry / custom bytecode) or raw calldata. Both live estimates side by side, the fee-vs-deposit breakdown, a **share link** that reproduces the measurement (`/app/lab?op=deploy&code=sample&run=1`) and **Export report** (JSON + SHA-256 stamp). |
+| `/app/leaderboard` | Six common ops measured live in your browser, cached with a timestamp, each with a compact fee/deposit bar and a "reproduce in Fee Lab" link. |
+| `/app/history` | Every measurement (Lab, Leaderboard, Calculator, landing) saved to localStorage (newest 500). Line charts of the all-in ratio, the fee-only ratio and EVM gas price over time, per-op filter, table, **Clear history**. |
+| `/app/calculator` | Op + ops/month → monthly cost on each surface from one live measurement, the cheaper path, the difference, and how much of the native cost is a refundable deposit hold. |
+| `/app/convert` | Address converter: EVM `0x` H160 ↔ AccountId32 ↔ SS58 (prefix 42 by default) with pallet-revive's mapping rules, validation and copy buttons. |
+| `/app/deploy` | Deploy `FeeRegistry.sol` and record a comparison on-chain through **your injected wallet**. DualFee holds no keys. |
+| `/app/verify` | Paste/upload an exported report; the stamp is recomputed and any edit is flagged. (Integrity, not a signature.) |
+| `/docs` | Methodology, formulas, units (live decimals and deposit constants), why the deposit dominates, calculator and report formulas, limits, sources. |
+| `/judges` | The 60-second path. |
+
+Old v0.1 paths (`/lab`, `/leaderboard`, `/deploy`) redirect to their `/app/*` equivalents.
+
+**Under the hood**
+
+- **One shared connection.** A `NetworkProvider` above the router opens the EVM RPC and a single Substrate `ApiPromise` at boot (while the splash is showing) and every route and estimate reuses it, so a cold `/app/leaderboard` no longer opens its own WebSocket. Per-surface status (block, gas price / fee multiplier, round-trip latency, WSS handshake time) refreshes every 12 s while the tab is visible.
+- **No silent disabled buttons.** Until both surfaces answer, measure buttons read "Connecting to EVM + Native…" (or whichever is still pending) with a spinner.
+- **Splash**: branded intro once per session (`sessionStorage`), 1.2–1.8 s, hard cap 2.5 s, an overlay so nothing waits on it, reduced-motion aware.
+- **Motion**: framer-motion for reveals, route cross-fades and count-ups; one easing curve; everything off under `prefers-reduced-motion`. Pages are lazy-loaded.
+- **SDK** (`packages/sdk`): `estimateBoth(tx)`, `pickCheapest(tx)`, `liveDecimals(api)`, EVM↔native account mapping. See [packages/sdk/README.md](packages/sdk/README.md).
+- **FeeRegistry** (`contracts/src/FeeRegistry.sol`): append-only on-chain log of comparisons (hash, op type, both fees, timestamp, `ComparisonRecorded` event).
+
+### Screenshots
+
+Captured from the production build with headless Chromium against the live testnet (2026-10-26).
+
+| Landing | Myth vs reality (live) |
+| --- | --- |
+| ![Landing hero](docs/screenshots/landing-hero.jpg) | ![Fee vs deposit stacked bar](docs/screenshots/landing-myth-vs-reality.jpg) |
+| **Fee Lab** | **Leaderboard** |
+| ![Fee Lab result](docs/screenshots/app-fee-lab.jpg) | ![Leaderboard](docs/screenshots/app-leaderboard.jpg) |
+| **History** | **Calculator** |
+| ![History charts](docs/screenshots/app-history.jpg) | ![Calculator](docs/screenshots/app-calculator.jpg) |
+| **Mobile (390 px)** | **Address converter (390 px)** |
+| ![Mobile landing](docs/screenshots/mobile-landing.jpg) | ![Mobile converter](docs/screenshots/mobile-convert.jpg) |
+
+### Design
+
+Dark technical "dual-surface instrument": violet = EVM, mint = Native, amber is reserved for the storage deposit; Space Grotesk / Inter / JetBrains Mono (all numbers mono, tabular); hairline grid + noise texture. Patterns were borrowed (not copied) from Sui and Navigate (Awwwards SOTD), Cantor8 (CSS Winner SOTD), the MotionSites dark gallery, Linear and Vercel. Details and links: [docs/design-references.md](docs/design-references.md).
 
 ## Architecture
 
 ```mermaid
 flowchart LR
   subgraph Browser["Browser (static SPA, no backend)"]
-    UI["React pages<br/>Landing · Fee Lab · Leaderboard · Deploy · Judges"]
+    UI["React pages<br/>/ · /docs · /judges · /app/{lab,leaderboard,history,calculator,convert,deploy,verify}"]
+    NP["NetworkProvider<br/>one EVM client + one shared ApiPromise"]
     SDK["@dualfee/sdk<br/>estimateBoth / pickCheapest"]
-    LS[("localStorage<br/>leaderboard cache")]
-    UI --> SDK
+    LS[("localStorage<br/>history · leaderboard cache")]
+    UI --> NP --> SDK
     UI <--> LS
   end
   SDK -- "eth_estimateGas × eth_gasPrice<br/>(wei, 18 dp)" --> EVM["EVM RPC<br/>test-evm-rpc-v3.portaldot.dev<br/>chain 420420777"]
@@ -80,7 +119,7 @@ Decimals are read at runtime from the chain properties (`tokenDecimals`) and the
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm test           # vitest: fee math, decimals, ratios, mapping, ABI encoding
+npm test           # vitest (48): fee math, decimals, ratios, mapping, ABI encoding, calculator, share-URL encoding, report hashing, history
 npm run build      # tsc -b && vite build  -> dist/
 npm run measure    # prints the live leaderboard numbers from Node
 ```
@@ -107,14 +146,21 @@ This is a Vite static build that's ready for Vercel: framework *Vite*, build com
 - **pallet-assets has no verified ERC-20 precompile address** here, so that row's EVM leg is shown as unavailable. We don't guess one.
 - **The storage deposit is a hold, not a burn.** It's refundable when the storage is freed. "All-in" counts it because it's tPOT you need up front.
 - **No EVM explorer links.** Portaldot's official explorers are Substrate-side, so DualFee never builds an EVM explorer URL from EVM data. Tx hashes are shown as-is.
-- **The 390px mobile layout** was designed for, but in this build session it was checked by code review, not on a device.
-- **Not deployed and not submitted** anywhere by this repo.
+- **Mobile** was checked at 390 px with headless Chromium (no horizontal overflow on any route), not on a physical device.
+- **History is per-browser.** It lives in localStorage; clearing site data removes it.
+- **The report stamp is a hash, not a signature.** It proves a report wasn't edited after export, not who exported it.
+- **The calculator is linear**: it doesn't model gas-price or fee-multiplier drift within a month.
 
 ## Sources
 
 - Portaldot V3 testnet endpoints (above): every number in this README came from them through `npm run measure`.
 - Polkadot SDK `pallet-revive` (account mapping `h160 ++ 0xEE×12`, `nativeToEthRatio`, `ReviveApi`). The mapping was checked against the live `ReviveApi.address` runtime call.
 - The ~289 vs 0.36 tPOT (~800×) deploy figure was reported by another Portaldot Hacker House builder. We credit it and re-measure it; we didn't reproduce their exact contract.
+
+## References
+
+- Design: [docs/design-references.md](docs/design-references.md) (Sui, Navigate, Cantor8, MotionSites, Linear, Vercel).
+- Methodology and formulas: [`/docs`](https://dualfee.vercel.app/docs).
 
 ## License
 
