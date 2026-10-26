@@ -5,7 +5,8 @@ import { EASE, prefersReducedMotion } from '../lib/motion';
 const KEY = 'dualfee.splash.seen';
 /** Visible at least this long (lets the wordmark land), at most HARD_CAP regardless of network. */
 const MIN_MS = 1200;
-const SOFT_MAX_MS = 1800;
+const SOFT_MAX_MS = 1600;
+const EXIT_MS = 400;
 const HARD_CAP_MS = 2500;
 
 export function splashAlreadySeen(): boolean {
@@ -15,7 +16,7 @@ export function splashAlreadySeen(): boolean {
 /**
  * Branded intro, once per browser session. It is an overlay: the app mounts (and both RPC
  * handshakes start) underneath it, so it never delays real work. `ready` lets it leave early
- * once both surfaces have answered; it never stays longer than ~1.8s (hard cap 2.5s).
+ * once both surfaces have answered; it is gone by ~2s (hard cap 2.5s including the exit wipe).
  */
 export default function Splash({ ready = false, status }: { ready?: boolean; status?: ReactNode }) {
   const [show, setShow] = useState(() => !splashAlreadySeen());
@@ -28,8 +29,8 @@ export default function Splash({ ready = false, status }: { ready?: boolean; sta
     const min = reduce ? 300 : MIN_MS;
     const elapsed = performance.now() - t0;
     const wait = ready ? Math.max(0, min - elapsed) : Math.max(0, (reduce ? 600 : SOFT_MAX_MS) - elapsed);
-    const id = setTimeout(() => setShow(false), Math.min(wait, HARD_CAP_MS));
-    const cap = setTimeout(() => setShow(false), HARD_CAP_MS - elapsed);
+    const id = setTimeout(() => setShow(false), Math.min(wait, HARD_CAP_MS - EXIT_MS));
+    const cap = setTimeout(() => setShow(false), Math.max(0, HARD_CAP_MS - EXIT_MS - elapsed));
     return () => { clearTimeout(id); clearTimeout(cap); };
   }, [show, ready, reduce, t0]);
 
@@ -40,7 +41,7 @@ export default function Splash({ ready = false, status }: { ready?: boolean; sta
           key="splash"
           className="fixed inset-0 z-[100] grid place-items-center bg-ink-950"
           initial={{ opacity: 1 }}
-          exit={reduce ? { opacity: 0, transition: { duration: 0.15 } } : { clipPath: 'inset(0 0 100% 0)', transition: { duration: 0.55, ease: EASE } }}
+          exit={reduce ? { opacity: 0, transition: { duration: 0.15 } } : { clipPath: 'inset(0 0 100% 0)', transition: { duration: EXIT_MS / 1000, ease: EASE } }}
           role="status"
           aria-label="Loading DualFee"
           onClick={() => setShow(false)}
