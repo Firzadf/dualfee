@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { estimateBoth, presetOps, type Comparison } from '@dualfee/sdk';
 import NetworkStrip from '../components/NetworkStrip';
+import MeasureButton from '../components/MeasureButton';
 import { networkFrom, useNetworkStatus } from '../lib/network';
 import { fmtRatio, tpot } from '../lib/format';
 
@@ -17,7 +18,7 @@ export default function Landing() {
     setErr(null);
     try {
       const op = presetOps().find((o) => o.id === 'deploy-erc20')!;
-      setC(await estimateBoth(op.tx, { network: net }));
+      setC(await estimateBoth(op.tx, { network: net, api: status.api ?? undefined }));
     } catch (e) {
       setErr(e instanceof Error ? e.message : String(e));
     } finally {
@@ -58,7 +59,7 @@ export default function Landing() {
             <h2 className="h2">Re-measuring the ~800× claim, live</h2>
             <p className="mt-1 text-sm text-ink-300">Deploy the sample ERC-20 (SampleToken.sol) both ways, right now, from your browser.</p>
           </div>
-          <button className="btn-primary" onClick={remeasure} disabled={busy || !status.evm || !status.native}>{busy ? 'Measuring…' : c ? 'Measure again' : 'Measure now'}</button>
+          <MeasureButton busy={busy} onClick={remeasure} idle={c ? 'Measure again' : 'Measure now'} />
         </div>
         {err && <p className="text-sm text-red-300">{err}</p>}
         {c && (

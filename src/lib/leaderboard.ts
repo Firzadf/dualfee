@@ -1,3 +1,4 @@
+import type { ApiPromise } from '@polkadot/api';
 import { estimateBoth, presetOps, serializeComparison, type Comparison, type NetworkConfig } from '@dualfee/sdk';
 
 export type Row = { id: string; label: string; detail: string; comparison: Comparison };
@@ -29,10 +30,10 @@ export function saveCache(rows: Row[], measuredAt: string) {
 }
 
 /** Measures every preset op live, one at a time (keeps the public RPCs happy). */
-export async function measureAll(network: NetworkConfig, onRow: (r: Row) => void): Promise<Row[]> {
+export async function measureAll(network: NetworkConfig, api: ApiPromise | null, onRow: (r: Row) => void): Promise<Row[]> {
   const rows: Row[] = [];
   for (const op of presetOps()) {
-    const comparison = await estimateBoth(op.tx, { network });
+    const comparison = await estimateBoth(op.tx, { network, api: api ?? undefined });
     const row = { id: op.id, label: op.label, detail: op.detail, comparison };
     rows.push(row);
     onRow(row);

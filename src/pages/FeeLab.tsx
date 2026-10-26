@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { SAMPLE, SampleTokenBytecode, estimateBoth, isH160, parseUnits, type Comparison, type DualTx } from '@dualfee/sdk';
 import ComparisonView from '../components/ComparisonView';
 import NetworkStrip from '../components/NetworkStrip';
+import MeasureButton from '../components/MeasureButton';
 import { networkFrom, useNetworkStatus } from '../lib/network';
 
 type Op = 'nativeTransfer' | 'erc20Transfer' | 'contractDeploy' | 'calldata';
@@ -54,7 +55,7 @@ export default function FeeLab() {
     setError(null);
     setResult(null);
     try {
-      setResult(await estimateBoth(tx, { network: net }));
+      setResult(await estimateBoth(tx, { network: net, api: status.api ?? undefined }));
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -110,7 +111,7 @@ export default function FeeLab() {
           </>
         )}
         <div className="flex flex-wrap items-center gap-3">
-          <button className="btn-primary" disabled={busy} onClick={run}>{busy ? 'Measuring both surfaces…' : 'Estimate on both surfaces'}</button>
+          <MeasureButton busy={busy} onClick={run} idle="Estimate on both surfaces" />
           <span className="text-xs text-ink-500">EVM: eth_estimateGas × eth_gasPrice. Native: ReviveApi dry-run + TransactionPaymentApi.query_info.</span>
         </div>
         {error && <p className="rounded-xl border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}

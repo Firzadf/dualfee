@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import NetworkStrip from '../components/NetworkStrip';
+import MeasureButton from '../components/MeasureButton';
 import { networkFrom, useNetworkStatus } from '../lib/network';
 import { loadCache, measureAll, saveCache, type Row } from '../lib/leaderboard';
 import { ago, fmtRatio, tpot } from '../lib/format';
@@ -12,14 +13,14 @@ export default function Leaderboard() {
   const [measuredAt, setMeasuredAt] = useState<string | null>(cached?.measuredAt ?? null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const ready = status.evm !== null && status.native !== null;
+  const ready = status.ready;
 
   async function refresh() {
     setBusy(true);
     setErr(null);
     const fresh: Row[] = [];
     try {
-      const all = await measureAll(net, (r) => { fresh.push(r); setRows([...fresh]); });
+      const all = await measureAll(net, status.api, (r) => { fresh.push(r); setRows([...fresh]); });
       const at = new Date().toISOString();
       saveCache(all, at);
       setMeasuredAt(at);
@@ -44,7 +45,7 @@ export default function Leaderboard() {
         </div>
         <div className="flex items-center gap-3">
           {measuredAt && <span className="text-xs text-ink-500">Cached {ago(measuredAt)} · {new Date(measuredAt).toLocaleString()}</span>}
-          <button className="btn-primary" onClick={refresh} disabled={busy || !ready}>{busy ? `Measuring ${rows.length + 1}/6…` : 'Re-measure live'}</button>
+          <MeasureButton busy={busy} onClick={refresh} idle="Re-measure live" busyLabel={`Measuring ${Math.min(rows.length + 1, 6)}/6…`} />
         </div>
       </div>
       <NetworkStrip s={status} />

@@ -54,7 +54,7 @@ export default function Deploy() {
 
   const doMeasure = () => guard('Measuring both surfaces…', async () => {
     const op = ops.find((o) => o.id === opId)!;
-    setCmp(await estimateBoth(op.tx, { network: net }));
+    setCmp(await estimateBoth(op.tx, { network: net, api: status.api ?? undefined }));
   });
 
   const doRecord = () => guard('Recording…', async () => {
