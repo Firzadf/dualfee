@@ -2,18 +2,19 @@ import { Link } from 'react-router-dom';
 
 const steps: { t: string; d: string; to?: string; href?: string; cta?: string }[] = [
   { t: '0–10s · Both surfaces are live', d: 'The network strip on any page shows the EVM chain id (420420777), block and gas price, and the Substrate chain, spec and token decimals (14 native vs 18 EVM) read from the runtime.', to: '/', cta: 'Home' },
-  { t: '10–25s · Re-measure the ~800× claim', d: 'Press “Measure now” on the home page. You get the EVM figure, the native fee alone, and native fee + storage deposit, side by side.', to: '/', cta: 'Measure' },
-  { t: '25–40s · Try any op', d: 'Fee Lab: switch between native transfer, ERC-20 transfer, deploy, or pasted calldata. Change the recipient to 0x2222…2222 to watch a storage deposit appear.', to: '/lab', cta: 'Fee Lab' },
-  { t: '40–50s · Leaderboard', d: 'Six common ops measured in your browser, cached in localStorage with a timestamp. “Re-measure live” refreshes them.', to: '/leaderboard', cta: 'Leaderboard' },
-  { t: '50–60s · Code and contract', d: 'packages/sdk exposes estimateBoth / pickCheapest and account mapping; FeeRegistry.sol records comparisons on-chain via MetaMask on /deploy. Unit tests cover fee math and decimals.', href: 'https://github.com/Firzadf/dualfee', cta: 'GitHub' },
+  { t: '10–25s · Re-measure the ~800× claim', d: 'The home page measures the sample deploy as soon as both surfaces answer: the EVM figure, the native fee alone, and fee + storage deposit as one stacked bar.', to: '/', cta: 'Measure' },
+  { t: '25–40s · Try any op', d: 'Fee Lab: switch between native transfer, ERC-20 transfer, deploy, or pasted calldata. Change the recipient to 0x2222…2222 to watch a storage deposit appear.', to: '/app/lab', cta: 'Fee Lab' },
+  { t: '40–50s · Leaderboard', d: 'Six common ops measured in your browser, cached in localStorage with a timestamp. “Re-measure live” refreshes them.', to: '/app/leaderboard', cta: 'Leaderboard' },
+  { t: '50–60s · Code and contract', d: 'packages/sdk exposes estimateBoth / pickCheapest and account mapping; FeeRegistry.sol records comparisons on-chain via MetaMask on /app/deploy. The method is in /docs. Unit tests cover fee math and decimals.', href: 'https://github.com/Firzadf/dualfee', cta: 'GitHub' },
 ];
 
 export default function Judges() {
   return (
     <div className="grid gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">The 60-second path</h1>
-        <p className="mt-1 text-sm text-ink-300">Everything is client-side and read-only. No wallet is needed except for the optional /deploy step.</p>
+        <span className="kicker">Judges</span>
+        <h1 className="h1">The 60-second path</h1>
+        <p className="mt-1 text-sm text-ink-300">Everything is client-side and read-only. No wallet is needed except for the optional /app/deploy step.</p>
       </div>
       <ol className="grid gap-3">
         {steps.map((s) => (

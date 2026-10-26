@@ -73,7 +73,7 @@ export default function Deploy() {
   return (
     <div className="grid gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Deploy & record</h1>
+        <h1 className="h1">Deploy & record</h1>
         <p className="mt-1 text-sm text-ink-300">Optional. Deploy <span className="mono">FeeRegistry.sol</span> with your own injected wallet and write a comparison on-chain. DualFee holds no keys; your wallet signs and pays.</p>
       </div>
 

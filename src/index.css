@@ -12,6 +12,8 @@
   html { -webkit-text-size-adjust: 100%; }
   body { @apply bg-ink-950 font-sans text-ink-100 antialiased; overflow-x: hidden; }
   h1, h2, h3 { @apply font-display; }
+  /* Grid items default to min-width:auto, which lets wide children (tickers, code, tables) push the page sideways. */
+  .grid > * { min-width: 0; }
   ::selection { background: #8b7bff55; }
   :focus-visible { outline: 2px solid #8b7bff; outline-offset: 2px; }
 }

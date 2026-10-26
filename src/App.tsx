@@ -1,22 +1,40 @@
-import { Route, Routes } from 'react-router-dom';
-import Layout from './components/Layout';
+import { lazy } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import SiteLayout from './layouts/SiteLayout';
+import AppShell from './layouts/AppShell';
 import Landing from './pages/Landing';
-import FeeLab from './pages/FeeLab';
-import Leaderboard from './pages/Leaderboard';
-import Deploy from './pages/Deploy';
-import Judges from './pages/Judges';
+
+const FeeLab = lazy(() => import('./pages/FeeLab'));
+const Leaderboard = lazy(() => import('./pages/Leaderboard'));
+const Deploy = lazy(() => import('./pages/Deploy'));
+const Docs = lazy(() => import('./pages/Docs'));
+const Judges = lazy(() => import('./pages/Judges'));
+
+/** Old v0.1 paths keep working (query string preserved). */
+function Legacy({ to }: { to: string }) {
+  const { search } = useLocation();
+  return <Navigate to={to + search} replace />;
+}
 
 export default function App() {
   return (
     <Routes>
-      <Route element={<Layout />}>
+      <Route element={<SiteLayout />}>
         <Route path="/" element={<Landing />} />
-        <Route path="/lab" element={<FeeLab />} />
-        <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/deploy" element={<Deploy />} />
+        <Route path="/docs" element={<Docs />} />
         <Route path="/judges" element={<Judges />} />
-        <Route path="*" element={<Landing />} />
       </Route>
+      <Route path="/app" element={<AppShell />}>
+        <Route index element={<Navigate to="/app/lab" replace />} />
+        <Route path="lab" element={<FeeLab />} />
+        <Route path="leaderboard" element={<Leaderboard />} />
+        <Route path="deploy" element={<Deploy />} />
+        <Route path="*" element={<Navigate to="/app/lab" replace />} />
+      </Route>
+      <Route path="/lab" element={<Legacy to="/app/lab" />} />
+      <Route path="/leaderboard" element={<Legacy to="/app/leaderboard" />} />
+      <Route path="/deploy" element={<Legacy to="/app/deploy" />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

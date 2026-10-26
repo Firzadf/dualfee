@@ -66,7 +66,7 @@ export default function FeeLab() {
   return (
     <div className="grid gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Fee Lab</h1>
+        <h1 className="h1">Fee Lab</h1>
         <p className="mt-1 text-sm text-ink-300">Pick an operation. DualFee asks both surfaces for a live estimate of the same thing, in parallel, from your browser.</p>
       </div>
       <NetworkStrip s={status} />

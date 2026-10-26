@@ -40,7 +40,7 @@ export default function Leaderboard() {
     <div className="grid gap-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Leaderboard</h1>
+          <h1 className="h1">Leaderboard</h1>
           <p className="mt-1 text-sm text-ink-300">Common operations, measured live in your browser and cached locally.</p>
         </div>
         <div className="flex items-center gap-3">
