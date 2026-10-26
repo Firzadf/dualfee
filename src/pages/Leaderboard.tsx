@@ -4,6 +4,9 @@ import MeasureButton from '../components/MeasureButton';
 import { networkFrom, useNetworkStatus } from '../lib/network';
 import { loadCache, measureAll, saveCache, type Row } from '../lib/leaderboard';
 import { ago, fmtRatio, tpot } from '../lib/format';
+import { Link } from 'react-router-dom';
+import { recordComparison } from '../lib/history';
+import { encodeLabParams, presetToLab } from '../lib/share';
 
 export default function Leaderboard() {
   const status = useNetworkStatus();
@@ -20,7 +23,7 @@ export default function Leaderboard() {
     setErr(null);
     const fresh: Row[] = [];
     try {
-      const all = await measureAll(net, status.api, (r) => { fresh.push(r); setRows([...fresh]); });
+      const all = await measureAll(net, status.api, (r) => { fresh.push(r); setRows([...fresh]); recordComparison(r.comparison, { opId: r.id, label: r.label, source: 'leaderboard' }); });
       const at = new Date().toISOString();
       saveCache(all, at);
       setMeasuredAt(at);
@@ -40,6 +43,7 @@ export default function Leaderboard() {
     <div className="grid gap-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
+          <span className="kicker">App / Leaderboard</span>
           <h1 className="h1">Leaderboard</h1>
           <p className="mt-1 text-sm text-ink-300">Common operations, measured live in your browser and cached locally.</p>
         </div>
@@ -72,6 +76,12 @@ export default function Leaderboard() {
                 <Stat k="Ratio all-in" v={fmtRatio(c.ratioAllIn)} />
                 <Stat k="Ratio vs fee only" v={fmtRatio(c.ratioVsNativeFeeOnly)} />
               </div>
+              {c.evm.status === 'ok' && c.native.status === 'ok' && (
+                <DepositBar e={c.evm.totalPlanck} f={c.native.partialFee} dep={c.native.storageDeposit} />
+              )}
+              {presetToLab(r.id) && (
+                <Link to={`/app/lab?${encodeLabParams({ ...presetToLab(r.id)!, run: true }).query}`} className="mt-3 inline-block font-mono text-[11px] text-ink-300 underline hover:text-white">reproduce in Fee Lab →</Link>
+              )}
               {(c.evm.status !== 'ok' || c.native.status !== 'ok') && (
                 <p className="mt-2 text-xs text-ink-500">{c.evm.status !== 'ok' ? `EVM: ${c.evm.reason}` : ''} {c.native.status !== 'ok' ? `Native: ${c.native.reason}` : ''}</p>
               )}
@@ -91,6 +101,18 @@ function Stat({ k, v, unit, tone, sub }: { k: string; v: string; unit?: string; 
       <div className="label">{k}</div>
       <div className={`font-semibold tabular-nums ${tone ?? ''}`}>{v} <span className="text-xs font-normal text-ink-500">{unit}</span></div>
       {sub && <div className="text-[11px] text-ink-500">{sub}</div>}
+    </div>
+  );
+}
+
+/** Compact bars on a shared scale: EVM total vs native fee + deposit. */
+function DepositBar({ e, f, dep }: { e: bigint; f: bigint; dep: bigint }) {
+  const max = e > f + dep ? e : f + dep;
+  const w = (x: bigint) => (max === 0n ? 0 : Number((x * 10000n) / max) / 100);
+  return (
+    <div className="mt-3 grid gap-1" aria-hidden>
+      <div className="flex h-1.5 overflow-hidden rounded bg-ink-800"><div className="bg-evm" style={{ width: `${w(e)}%` }} /></div>
+      <div className="flex h-1.5 overflow-hidden rounded bg-ink-800"><div className="bg-native" style={{ width: `${Math.max(f > 0n ? 0.5 : 0, w(f))}%` }} /><div className="bg-deposit" style={{ width: `${w(dep)}%` }} /></div>
     </div>
   );
 }

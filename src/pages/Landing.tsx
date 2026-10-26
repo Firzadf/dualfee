@@ -11,6 +11,7 @@ import CountUp from '../components/ui/CountUp';
 import { useNet } from '../lib/network';
 import { fmtRatio, tpot } from '../lib/format';
 import { FEATURES } from '../lib/features';
+import { recordComparison } from '../lib/history';
 
 function Section({ n, title, kicker, children }: { n: string; title: string; kicker: string; children: React.ReactNode }) {
   return (
@@ -36,7 +37,9 @@ export default function Landing() {
     setErr(null);
     try {
       const op = presetOps().find((o) => o.id === 'deploy-erc20')!;
-      setC(await estimateBoth(op.tx, { network: net.config, api: net.api ?? undefined }));
+      const r = await estimateBoth(op.tx, { network: net.config, api: net.api ?? undefined });
+      setC(r);
+      recordComparison(r, { opId: op.id, label: op.label, source: 'landing' });
     } catch (e) {
       setErr(e instanceof Error ? e.message : String(e));
     } finally {

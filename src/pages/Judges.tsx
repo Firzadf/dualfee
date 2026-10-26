@@ -5,7 +5,8 @@ const steps: { t: string; d: string; to?: string; href?: string; cta?: string }[
   { t: '10–25s · Re-measure the ~800× claim', d: 'The home page measures the sample deploy as soon as both surfaces answer: the EVM figure, the native fee alone, and fee + storage deposit as one stacked bar.', to: '/', cta: 'Measure' },
   { t: '25–40s · Try any op', d: 'Fee Lab: switch between native transfer, ERC-20 transfer, deploy, or pasted calldata. Change the recipient to 0x2222…2222 to watch a storage deposit appear.', to: '/app/lab', cta: 'Fee Lab' },
   { t: '40–50s · Leaderboard', d: 'Six common ops measured in your browser, cached in localStorage with a timestamp. “Re-measure live” refreshes them.', to: '/app/leaderboard', cta: 'Leaderboard' },
-  { t: '50–60s · Code and contract', d: 'packages/sdk exposes estimateBoth / pickCheapest and account mapping; FeeRegistry.sol records comparisons on-chain via MetaMask on /app/deploy. The method is in /docs. Unit tests cover fee math and decimals.', href: 'https://github.com/Firzadf/dualfee', cta: 'GitHub' },
+  { t: '50–55s · History, calculator, share', d: 'History charts every measurement (ratio and gas price over time). The calculator turns ops/month into monthly cost on each surface. Any Lab result has a share link (/app/lab?op=deploy&code=sample&run=1) and an “Export report” JSON with a SHA-256 stamp you can check in /app/verify.', to: '/app/history', cta: 'History' },
+  { t: '55–60s · Code and contract', d: 'packages/sdk exposes estimateBoth / pickCheapest and account mapping; FeeRegistry.sol records comparisons on-chain via MetaMask on /app/deploy. The method is in /docs. Unit tests cover fee math and decimals.', href: 'https://github.com/Firzadf/dualfee', cta: 'GitHub' },
 ];
 
 export default function Judges() {

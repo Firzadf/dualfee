@@ -75,6 +75,33 @@ recommended      = "either" if |evm − native| / max(evm, native) ≤ ${(TIE_BA
       ),
     },
     {
+      id: 'calculator',
+      title: 'Cost calculator',
+      body: (
+        <>
+          <Code>{`monthly_evm        = evm_total_planck × n
+monthly_native     = (partialFee + storageDeposit) × n
+of which held      = storageDeposit × n            // refundable hold, not burned
+difference         = |monthly_evm − monthly_native|
+cheaper            = "either" within ${(TIE_BAND * 100).toFixed(0)}%, else the smaller one`}</Code>
+          <p>All in bigint planck. It is a linear projection of one live measurement: it assumes today's gas price, fee multiplier and storage pattern for every op.</p>
+        </>
+      ),
+    },
+    {
+      id: 'reports',
+      title: 'Share links, reports & verification',
+      body: (
+        <>
+          <p>Fee Lab state is encoded in the URL (<span className="mono">/app/lab?op=deploy&amp;code=sample&amp;run=1</span>; keys <span className="mono">op, from, to, amount, token, rcpt, tamt, code, callTo, data, run</span>). Every value is validated on load; invalid ones are dropped and listed. Custom hex longer than 12,000 chars is left out of the URL.</p>
+          <Code>{`report = { schema: "dualfee.report/v1", generatedAt, app, op, network, comparison }
+stamp  = SHA-256( canonical_json(report) )      // keys sorted, bigints as strings, no whitespace
+verify : recompute over the file minus "stamp" and compare`}</Code>
+          <p>The stamp proves integrity (the numbers weren't edited after export), not origin: it's a hash, not a signature. For an on-chain record, use <Link className="underline" to="/app/deploy">Deploy / Record</Link>, which writes a keccak256 of the comparison to FeeRegistry.sol.</p>
+        </>
+      ),
+    },
+    {
       id: 'limits',
       title: 'Limits',
       body: (
@@ -83,7 +110,8 @@ recommended      = "either" if |evm − native| / max(evm, native) ≤ ${(TIE_BA
           <li><b>Sample inputs are public testnet data.</b> A dry-run needs an origin that can afford the op, so a custom <span className="mono">from</span> with no balance can come back as unavailable.</li>
           <li><b>pallet-assets</b> has no verified ERC-20 precompile address here, so that EVM leg is shown as unavailable; we don't guess one.</li>
           <li><b>No EVM explorer links.</b> Portaldot's official explorers are Substrate-side.</li>
-          <li><b>Local only.</b> History and caches live in your browser's localStorage; nothing is uploaded.</li>
+          <li><b>Local only.</b> History and caches live in your browser's localStorage (newest 500 measurements); nothing is uploaded.</li>
+          <li><b>Calculator is linear.</b> It does not model gas-price or fee-multiplier drift over a month.</li>
         </ul>
       ),
     },
