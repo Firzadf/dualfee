@@ -1,0 +1,12 @@
+{
+  "name": "@dualfee/contracts",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test"
+  },
+  "devDependencies": {
+    "hardhat": "^2.22.17"
+  }
+}

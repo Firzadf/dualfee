@@ -1,0 +1,159 @@
+{
+  "contractName": "FeeRegistry",
+  "compiler": "0.8.28+commit.7893614a.Emscripten.clang",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "EmptyHash",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "comparisonHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "enum FeeRegistry.OpType",
+          "name": "opType",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint128",
+          "name": "evmFeeWei",
+          "type": "uint128"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint128",
+          "name": "nativeFeePlanck",
+          "type": "uint128"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "timestamp",
+          "type": "uint64"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "recorder",
+          "type": "address"
+        }
+      ],
+      "name": "ComparisonRecorded",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "count",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "get",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "comparisonHash",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "enum FeeRegistry.OpType",
+              "name": "opType",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint128",
+              "name": "evmFeeWei",
+              "type": "uint128"
+            },
+            {
+              "internalType": "uint128",
+              "name": "nativeFeePlanck",
+              "type": "uint128"
+            },
+            {
+              "internalType": "uint64",
+              "name": "timestamp",
+              "type": "uint64"
+            },
+            {
+              "internalType": "address",
+              "name": "recorder",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct FeeRegistry.Comparison",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "comparisonHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "enum FeeRegistry.OpType",
+          "name": "opType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint128",
+          "name": "evmFeeWei",
+          "type": "uint128"
+        },
+        {
+          "internalType": "uint128",
+          "name": "nativeFeePlanck",
+          "type": "uint128"
+        }
+      ],
+      "name": "record",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600e575f5ffd5b506104c88061001c5f395ff3fe608060405234801561000f575f5ffd5b506004361061003f575f3560e01c806306661abd146100435780635c253272146100595780639507d39a1461006c575b5f5ffd5b5f545b6040519081526020015b60405180910390f35b610046610067366004610370565b61008c565b61007f61007a3660046103bf565b610264565b60405161005091906103ea565b5f846100ab57604051631c37cddf60e21b815260040160405180910390fd5b505f80546040805160c0810190915286815290914291602081018760038111156100d7576100d76103d6565b81526001600160801b03808816602080840191909152908716604083015267ffffffffffffffff85166060830152336080909201919091528254600181810185555f948552938290208351600490920201908155908201518184018054939492939192909160ff191690836003811115610153576101536103d6565b0217905550604082015160018201805470ffffffffffffffffffffffffffffffff0019166101006001600160801b039384160217905560608301516002830180546080860151929093166001600160c01b031990931692909217600160801b67ffffffffffffffff9092169190910217905560a090910151600391820180546001600160a01b0319166001600160a01b0390921691909117905585908111156101fe576101fe6103d6565b604080516001600160801b0387811682528616602082015267ffffffffffffffff8416818301523360608201529051889185917f872b671cc9551c83853e1f6ef7e86d0bb2736744e37af002005d9bfd48d1ed7f9181900360800190a450949350505050565b6040805160c0810182525f80825260208201819052918101829052606081018290526080810182905260a08101919091525f82815481106102a7576102a761047e565b905f5260205f2090600402016040518060c00160405290815f8201548152602001600182015f9054906101000a900460ff1660038111156102ea576102ea6103d6565b60038111156102fb576102fb6103d6565b8152600182015461010090046001600160801b03908116602083015260028301549081166040830152600160801b900467ffffffffffffffff1660608201526003909101546001600160a01b031660809091015292915050565b80356001600160801b038116811461036b575f5ffd5b919050565b5f5f5f5f60808587031215610383575f5ffd5b84359350602085013560048110610398575f5ffd5b92506103a660408601610355565b91506103b460608601610355565b905092959194509250565b5f602082840312156103cf575f5ffd5b5035919050565b634e487b7160e01b5f52602160045260245ffd5b81518152602082015160c08201906004811061041457634e487b7160e01b5f52602160045260245ffd5b806020840152506001600160801b0360408401511660408301526001600160801b036060840151166060830152608083015161045c608084018267ffffffffffffffff169052565b5060a083015161047760a08401826001600160a01b03169052565b5092915050565b634e487b7160e01b5f52603260045260245ffdfea2646970667358221220b091f3ad5f2979b67dd4580d06c56ab0c990adc902704fd480b5c76d7fecf65664736f6c634300081c0033"
+}
